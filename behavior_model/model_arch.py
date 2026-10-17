@@ -273,7 +273,7 @@ class LATISBehaviorNet(nn.Module):
         pooled = torch.sum(out * weights, dim=1)
         return self.field_proj(pooled)
 
-    def encode_fields(self, field_tensors: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
+    def encode_fields(self, field_tensors: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
         """
         Phase H.4 Field-aware context encoding:
         field_tensors: (B, 5, field_len) where 5 fields are [sys, doc, mem, auth, query]

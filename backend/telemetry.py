@@ -15,7 +15,7 @@ import collections
 import re
 import time
 import uuid
-from typing import Any, Dict, List, Optional, Set
+from typing import Any, Dict, List, Optional, OrderedDict, Set
 from pydantic import BaseModel, Field
 
 # ------------------------------------------------------------------------------
@@ -158,7 +158,7 @@ class BoundedEventStore:
     """
     def __init__(self, capacity: int = DEFAULT_MAX_EVENTS):
         self.capacity = max(1, capacity)
-        self._events_by_id: Dict[str, TelemetryEvent] = collections.OrderedDict()
+        self._events_by_id: OrderedDict[str, TelemetryEvent] = collections.OrderedDict()
 
     def record_event(self, event: TelemetryEvent) -> TelemetryEvent:
         if not event.event_id:
@@ -203,7 +203,7 @@ class BoundedAlertStore:
     """
     def __init__(self, capacity: int = DEFAULT_MAX_ALERTS):
         self.capacity = max(1, capacity)
-        self._alerts_by_id: Dict[str, AlertRecord] = collections.OrderedDict()
+        self._alerts_by_id: OrderedDict[str, AlertRecord] = collections.OrderedDict()
 
     def record_alert(self, alert: AlertRecord) -> AlertRecord:
         alert.validate_semantics()
