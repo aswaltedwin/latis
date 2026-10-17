@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LATIS — Incident Investigation</title>
+    <!-- Google Fonts: Inter & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <!-- Three.js 3D Library for Nova Sentinel Mascot -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="mascot.js" defer></script>
+</head>
+<body>
+    <div id="notionApp">
+        <!-- Notion Sidebar -->
+        <aside id="notionSidebar">
+            <div>
+                <!-- Workspace Title -->
+                <div class="sidebar-header">
+                    <div class="workspace-title">
+                        <div class="workspace-icon">⚡</div>
+                        <span>LATIS Security</span>
+                    </div>
+                    <button class="sidebar-toggle-btn" onclick="toggleSidebar()" title="Collapse sidebar">⇤</button>
+                </div>
+
+                <!-- Navigation Views -->
+                <div class="sidebar-section-label">Workspace</div>
+                <ul class="sidebar-nav-list">
+                    <li class="sidebar-nav-item active" id="tabBtnSecOps" onclick="switchTab('secops')">
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <span class="icon">🚨</span>
+                            <span>Alerts & Activity</span>
+                        </div>
+                        <span class="sidebar-badge" id="sidebarAlertCount">0</span>
+                    </li>
+                    <li class="sidebar-nav-item" id="tabBtnMission" onclick="switchTab('mission')">
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <span class="icon">🔬</span>
+                            <span>Incident Investigation</span>
+                        </div>
+                    </li>
+                </ul>
+
+                <!-- Active Cases / Switcher -->
+                <div style="display: flex; align-items: center; justify-content: space-between; padding: 4px 8px;">
+                    <span class="sidebar-section-label" style="padding: 0;">Incidents</span>
+                    <button class="notion-btn" style="padding: 1px 6px; font-size: 0.72rem;" onclick="openIngestModal()">+ New</button>
+                </div>
+                <div class="sidebar-cases-list" id="sidebarCasesList">
+                    <!-- Populated dynamically via JS -->
+                </div>
+            </div>
+
+            <!-- Sidebar Footer -->
+            <div class="sidebar-footer">
+                <div style="display: flex; align-items: center; justify-content: space-between; padding: 4px 6px;">
+                    <div class="status-badge active" id="engineStatusBadge">
+                        <div class="status-dot"></div>
+                        <span id="engineStatusText">Engine Ready</span>
+                    </div>
+                    <button class="notion-btn" style="padding: 2px 6px; font-size: 0.72rem;" onclick="toggleTheme()" id="btnThemeToggle" title="Toggle Light/Dark">🌗</button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Notion Main Content Page -->
+        <div id="notionMain">
+            <!-- Minimal Notion Topbar -->
+            <header class="notion-topbar">
+                <div class="notion-topbar-left">
+                    <button class="sidebar-toggle-btn" id="sidebarExpandBtn" style="display: none;" onclick="toggleSidebar()" title="Open sidebar">☰</button>
+                    <div class="notion-breadcrumb">
+                        <span>LATIS</span>
+                        <span class="sep">/</span>
+                        <span id="topCaseBreadcrumb">CURRENT CASE</span>
+                    </div>
+                </div>
+
+                <div class="notion-topbar-right">
+                    <!-- Quick Case Selector Dropdown (Hidden/Fallback for script sync) -->
+                    <select id="caseSelect" onchange="onCaseSelected(this.value)" style="font-size:0.8rem; padding:2px 6px; border-radius:4px; border:1px solid var(--border-medium); background:var(--bg-card); color:var(--text-main); font-family:inherit;">
+                        <option value="" disabled selected>Select Incident...</option>
+                    </select>
+                    <button class="notion-btn notion-btn-secondary" onclick="exportReport()">
+                        📄 View Report
+                    </button>
+                </div>
+            </header>
+
+            <div id="errorBanner"></div>
+
+            <!-- ========================================================= -->
+            <!-- VIEW 1: SECURITY ALERTS & LIVE LOGS                      -->
+            <!-- ========================================================= -->
+            <div class="notion-page-scroll" id="secOpsView">
+                <div class="notion-page-icon">🚨</div>
+                <h1 class="notion-page-title">Alerts & Live Activity</h1>
+                <p class="notion-page-desc">Real-time AI activity logs, security warnings, and incident root cause detection.</p>
+
+                <!-- Metrics Row -->
+                <div class="notion-metrics-row" id="secOpsMetrics">
+                    <div class="notion-metric-box">
+                        <span class="notion-metric-label">Total Alerts</span>
+                        <span class="notion-metric-num" id="metricTotalAlerts">0</span>
+                    </div>
+                    <div class="notion-metric-box">
+                        <span class="notion-metric-label">Critical</span>
+                        <span class="notion-metric-num" style="color: var(--status-critical);" id="metricCriticalAlerts">0</span>
+                    </div>
+                    <div class="notion-metric-box">
+                        <span class="notion-metric-label">High Severity</span>
+                        <span class="notion-metric-num" style="color: var(--status-high);" id="metricHighAlerts">0</span>
+                    </div>
+                    <div class="notion-metric-box">
+                        <span class="notion-metric-label">Investigating</span>
+                        <span class="notion-metric-num" style="color: var(--status-low);" id="metricInvestigating">0</span>
+                    </div>
+                    <div class="notion-metric-box">
+                        <span class="notion-metric-label">Open Incidents</span>
+                        <span class="notion-metric-num" style="color: var(--accent-primary);" id="metricActiveCases">0</span>
+                    </div>
+                </div>
+
+                <!-- NOVA 3D SENTINEL MASCOT INTERACTIVE HUD -->
+                <div class="notion-card nova-mascot-card" style="padding: 16px 20px; margin-bottom: 16px; background: linear-gradient(135deg, rgba(15, 23, 42, 0.85) 0%, rgba(30, 41, 59, 0.7) 100%); border: 1px solid rgba(56, 189, 248, 0.25); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35); position: relative; overflow: hidden;">
+                    <div style="position: absolute; top: -50px; right: -50px; width: 150px; height: 150px; background: radial-gradient(circle, rgba(56, 189, 248, 0.15) 0%, transparent 70%); pointer-events: none;"></div>
+                    
+                    <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
+                        <!-- 3D Canvas Container -->
+                        <div style="position: relative; width: 130px; height: 130px; flex-shrink: 0; cursor: pointer; display: flex; align-items: center; justify-content: center;" title="Click Nova to interact!" onclick="if(window.NOVA) window.NOVA.onClick();">
+                            <div id="novaMascotContainer" style="width: 130px; height: 130px;"></div>
+                            <span id="novaMoodBadge" class="nova-badge idle" style="position: absolute; bottom: 0; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; padding: 2px 8px; border-radius: 12px; background: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1px solid #38bdf8; letter-spacing: 0.5px;">MONITORING</span>
+                        </div>
+
+                        <!-- Nova Dialogue & Autonomous Controller -->
+                        <div style="flex: 1; min-width: 260px;">
+                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <span style="font-size: 1.05rem; font-weight: 700; color: #f8fafc; letter-spacing: 0.2px;">NOVA</span>
+                                    <span class="notion-pill blue" style="font-size: 0.68rem; padding: 1px 7px;">SENTINEL AGENT v2.4</span>
+                                    <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #10b981; box-shadow: 0 0 8px #10b981; margin-left: 2px;" title="Online"></span>
+                                </div>
+                                <div style="display: flex; gap: 6px;">
+                                    <button class="notion-btn notion-btn-primary" style="font-size: 0.75rem; padding: 4px 10px;" onclick="streamNextRow();">
+                                        ⚡ Command: Scan Next
+                                    </button>
+                                    <button class="notion-btn" style="font-size: 0.75rem; padding: 4px 10px; background: rgba(255,255,255,0.06);" onclick="if(window.NOVA) window.NOVA.onClick();">
+                                        💬 Talk to Nova
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Futuristic Speech HUD Bubble -->
+                            <div class="nova-speech-bubble" style="background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(56, 189, 248, 0.2); border-radius: 8px; padding: 10px 14px; position: relative;">
+                                <div style="font-size: 0.72rem; color: #94a3b8; font-family: var(--font-mono); margin-bottom: 2px; display: flex; align-items: center; gap: 5px;">
+                                    <span style="color: #38bdf8;">◈</span> LIVE FORENSIC COMMENTARY
+                                </div>
+                                <div id="novaSpeechText" style="font-size: 0.82rem; color: #e2e8f0; line-height: 1.45; font-weight: 500;">
+                                    System initialized. Ready to protect your AI pipelines and track down causal vulnerabilities.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Clean Collapsible / Stream Controller -->
+                <div class="notion-card" style="padding: 14px 16px;">
+                    <div class="notion-card-header" style="margin-bottom: 8px;">
+                        <div class="notion-card-title">
+                            <span>📡 Live Activity Feed</span>
+                            <span class="notion-pill blue" id="streamProgressText">Row 0 / 55</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <button class="notion-btn notion-btn-primary" onclick="streamNextRow()">
+                                ▶ Next Event
+                            </button>
+                            <button class="notion-btn notion-btn-secondary" id="btnStreamAutoPlay" onclick="toggleStreamAutoPlay()">
+                                ⚡ Auto-Play
+                            </button>
+                            <button class="notion-btn" onclick="resetStreamData()">
+                                ↺ Reset
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Clean Event Banner -->
+                    <div style="display: grid; grid-template-columns: 130px 1fr 120px 140px; gap: 12px; align-items: center; padding: 10px 12px; background: var(--bg-subtle); border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
+                        <div>
+                            <div style="font-size: 0.7rem; color: var(--text-muted); font-family: var(--font-mono);" id="streamEventId">EVT-READY</div>
+                            <div style="font-size: 0.8rem; font-weight: 600; color: var(--text-main);" id="streamEventType">FEED READY</div>
+                        </div>
+                        <div style="min-width: 0;">
+                            <div style="font-size: 0.7rem; color: var(--text-muted);">Incoming User Query / Input</div>
+                            <div style="font-size: 0.8rem; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: var(--font-mono);" id="streamUserQuery">
+                                Click 'Next Event' or 'Auto-Play' to test live queries
+                            </div>
+                        </div>
+                        <div>
+                            <div style="font-size: 0.7rem; color: var(--text-muted);">Risk Level</div>
+                            <div id="streamSeverityBadge" style="font-size: 0.78rem; font-weight: 600; color: var(--text-secondary); margin-top: 2px;">—</div>
+                        </div>
+                        <div id="streamEradicateContainer" style="display: flex; justify-content: flex-end;">
+                            <button class="notion-btn notion-btn-secondary" disabled id="btnEradicateStream">Block & Fix Threat</button>
+                        </div>
+                    </div>
+
+                    <!-- Fix Strategy (Auto Shown on Threat) -->
+                    <div id="streamBlueprintPanel" style="display: none; margin-top: 10px; padding: 10px 12px; border-radius: var(--radius-sm); background: var(--tag-red-bg); color: var(--tag-red-text);">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-size: 0.78rem; font-weight: 700;" id="blueprintStrategyTitle">RECOMMENDED FIX</span>
+                            <span style="font-size: 0.72rem;" id="blueprintStatusText">Action Required</span>
+                        </div>
+                        <ul id="blueprintActionsList" style="margin: 6px 0 0 16px; padding: 0; font-size: 0.76rem; color: var(--text-main);"></ul>
+                    </div>
+                </div>
+
+                <!-- Alert Feed & Evidence Split Grid -->
+                <div class="notion-split-view">
+                    <!-- Alert List Column -->
+                    <div>
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                            <span style="font-size: 0.84rem; font-weight: 600; color: var(--text-main);">Security Alerts</span>
+                            <div style="display: flex; gap: 4px;">
+                                <span id="pollingStatusIndicator" style="display:none;"></span>
+                                <button class="notion-btn" style="padding: 2px 6px; font-size: 0.72rem;" onclick="loadAlerts()">Refresh</button>
+                                <button class="notion-btn" style="padding: 2px 6px; font-size: 0.72rem;" onclick="clearAlertQueue()">Clear</button>
+                            </div>
+                        </div>
+                        <div id="alertsList">
+                            <div class="empty-state-card" id="alertsLoadingState">
+                                <div>Loading alerts...</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Evidence & Details Column -->
+                    <div class="notion-card">
+                        <div class="notion-card-header">
+                            <span class="notion-card-title">Security Evidence & Timeline</span>
+                            <span id="selectedAlertBadge" class="notion-pill gray">No Alert Selected</span>
+                        </div>
+                        <div id="alertDetailPanel">
+                            <div class="empty-state-card" id="alertDetailPlaceholder">
+                                <div style="font-weight: 600;">Select an alert to inspect</div>
+                                <div>Click on any alert in the queue to view details and root cause.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========================================================= -->
+            <!-- VIEW 2: INCIDENT INVESTIGATION WORKSTATION                -->
+            <!-- ========================================================= -->
+            <main class="notion-page-scroll" id="missionControlView" style="display: none;">
+                <div class="notion-page-icon">🔬</div>
+                <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 8px;">
+                    <div>
+                        <span class="notion-pill red" id="caseStatusBadge">UNDER REVIEW</span>
+                        <h1 class="notion-page-title" id="caseTitle" style="margin-top: 6px; margin-bottom: 0;">Incident Case</h1>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span id="expCountBadge" class="notion-pill gray">0 Tests</span>
+                        <button class="notion-btn notion-btn-danger" id="btnEradicateThreat" onclick="openRemediationModal()">
+                            🛡️ Fix & Secure AI
+                        </button>
+                        <button class="notion-btn notion-btn-secondary" onclick="exportReport()">
+                            View Report
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Incident Metadata Table (Notion Property List) -->
+                <div class="notion-property-grid">
+                    <div class="notion-prop-name"><span>🏷️</span> Incident ID</div>
+                    <div class="notion-prop-val"><span class="notion-pill blue" id="caseId">—</span></div>
+
+                    <div class="notion-prop-name"><span>💬</span> Prompt / Query</div>
+                    <div class="notion-prop-val" id="userQuery" style="font-family: var(--font-mono); font-size: 0.78rem;">—</div>
+
+                    <div class="notion-prop-name"><span>⚠️</span> What Went Wrong</div>
+                    <div class="notion-prop-val"><span class="notion-pill red" id="observedFailure">—</span></div>
+
+                    <div class="notion-prop-name"><span>🕸️</span> Root Cause Pattern</div>
+                    <div class="notion-prop-val"><span class="notion-pill yellow" id="causalTopologyVal">UNDER REVIEW</span></div>
+
+                    <div class="notion-prop-name"><span>⚖️</span> Resolution Status</div>
+                    <div class="notion-prop-val" id="governanceStatusVal" style="font-weight: 500;">CHECKING</div>
+                </div>
+
+                <!-- Interactive System Diagram Canvas -->
+                <details class="notion-toggle" open>
+                    <summary>Interactive System Flow Diagram</summary>
+                    <div class="notion-toggle-content">
+                        <div class="graph-card-wrapper">
+                            <!-- Canvas Control Bar -->
+                            <div class="graph-toolbar">
+                                <div class="graph-legend">
+                                    <span class="legend-chip"><span class="legend-dot necessary"></span> Main Root Cause</span>
+                                    <span class="legend-chip"><span class="legend-dot enabling"></span> Helper / Weak Link</span>
+                                    <span class="legend-chip"><span class="legend-dot joint"></span> Team / Joint Cause</span>
+                                    <span class="legend-chip"><span class="legend-dot external"></span> Safe / Clean Part</span>
+                                </div>
+                                <div class="graph-actions">
+                                    <button class="notion-btn notion-btn-secondary" onclick="zoomGraph(1.15)" title="Zoom In">🔍 +</button>
+                                    <button class="notion-btn notion-btn-secondary" onclick="zoomGraph(0.85)" title="Zoom Out">🔍 −</button>
+                                    <button class="notion-btn notion-btn-secondary" onclick="resetGraphView()" title="Fit to View">↺ Reset View</button>
+                                </div>
+                            </div>
+
+                            <!-- Interactive SVG Canvas Container -->
+                            <div class="graph-container" id="graphContainer">
+                                <svg width="100%" height="320" viewBox="0 0 920 320" xmlns="http://www.w3.org/2000/svg" id="dependencyGraphSvg">
+                                    <defs>
+                                        <!-- Grid pattern background for canvas feel -->
+                                        <pattern id="graphGrid" width="24" height="24" patternUnits="userSpaceOnUse">
+                                            <circle cx="2" cy="2" r="1" fill="currentColor" class="grid-dot"/>
+                                        </pattern>
+                                        <!-- Flow particle markers -->
+                                        <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                                            <path d="M 0 0 L 10 5 L 0 10 z" fill="#9B9A97"/>
+                                        </marker>
+                                        <marker id="arrow-rose" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                                            <path d="M 0 0 L 10 5 L 0 10 z" fill="#D44040"/>
+                                        </marker>
+                                        <marker id="arrow-amber" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                                            <path d="M 0 0 L 10 5 L 0 10 z" fill="#D9730D"/>
+                                        </marker>
+                                        <marker id="arrow-cyan" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                                            <path d="M 0 0 L 10 5 L 0 10 z" fill="#2383E2"/>
+                                        </marker>
+                                        <filter id="nodeGlow" x="-20%" y="-20%" width="140%" height="140%">
+                                            <feDropShadow dx="0" dy="2" stdDeviation="4" flood-opacity="0.12"/>
+                                        </filter>
+                                    </defs>
+                                    <!-- Background interactive grid -->
+                                    <rect width="100%" height="100%" fill="url(#graphGrid)"/>
+                                    <!-- Dynamic Zoomable & Pannable Group -->
+                                    <g id="svgGraphTransform" transform="translate(0, 0) scale(1)">
+                                        <g id="svgGraphLinks"></g>
+                                        <g id="svgGraphContent"></g>
+                                    </g>
+                                </svg>
+                                <div class="canvas-hint">Drag cards to move • Drag canvas to pan • Scroll to zoom • Click card to view details</div>
+                            </div>
+
+                            <!-- Live Component Inspector Drawer (Shown on Card Click) -->
+                            <div id="componentDetailDrawer" class="component-inspector-drawer" style="display: none;">
+                                <div class="inspector-header">
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <span class="inspector-icon" id="inspCompIcon">🧩</span>
+                                        <div>
+                                            <div style="font-size: 0.88rem; font-weight: 700; color: var(--text-main); font-family: var(--font-mono);" id="inspCompId">COMPONENT_ID</div>
+                                            <div style="font-size: 0.74rem; color: var(--text-secondary);" id="inspCompLabel">Component Label</div>
+                                        </div>
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <span id="inspCompRoleBadge" class="role-badge role-necessary">TESTING</span>
+                                        <button class="notion-btn" onclick="closeComponentDrawer()" style="padding: 2px 6px;">✕</button>
+                                    </div>
+                                </div>
+                                <div class="inspector-body">
+                                    <div class="inspector-grid">
+                                        <div class="inspector-item">
+                                            <div class="inspector-item-label">Part Type</div>
+                                            <div class="inspector-item-val" id="inspCompType">Document / Tool</div>
+                                        </div>
+                                        <div class="inspector-item">
+                                            <div class="inspector-item-label">Role in Problem</div>
+                                            <div class="inspector-item-val" id="inspCompCausalRole">Checking...</div>
+                                        </div>
+                                        <div class="inspector-item">
+                                            <div class="inspector-item-label">Effect When Turned Off</div>
+                                            <div class="inspector-item-val" id="inspCompImpact">—</div>
+                                        </div>
+                                        <div class="inspector-item">
+                                            <div class="inspector-item-label">Security Check</div>
+                                            <div class="inspector-item-val" id="inspCompTamper">Clean</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div style="font-size: 0.74rem; font-weight: 600; color: var(--text-secondary); margin-top: 10px; margin-bottom: 4px;">
+                                        CONTENT & SPECIFICATION
+                                    </div>
+                                    <pre class="evidence-code-block" id="inspCompRawContent">Select a part to view content</pre>
+
+                                    <div class="inspector-actions" style="margin-top: 12px; display: flex; justify-content: flex-end; gap: 8px;">
+                                        <button class="notion-btn notion-btn-secondary" id="inspBtnMask" onclick="executeInspectorMask()">
+                                            ⚡ Turn Off & Test (Isolate)
+                                        </button>
+                                        <button class="notion-btn notion-btn-danger" id="inspBtnQuarantine" onclick="executeInspectorQuarantine()">
+                                            🛡️ Quarantine & Block
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </details>
+
+                <!-- Investigation Grid: Hypotheses & Interventions -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;">
+                    <!-- Left: Hypotheses -->
+                    <div class="notion-card">
+                        <div class="notion-card-header">
+                            <span class="notion-card-title">Possible Causes</span>
+                            <span id="hypConfidenceBadge" class="notion-pill blue">Confidence: 0.0%</span>
+                        </div>
+                        <div id="hypothesisBoard" style="display: flex; flex-direction: column; gap: 8px;">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+
+                    <!-- Right: Next Best Action & Intervention -->
+                    <div class="notion-card">
+                        <div class="notion-card-header">
+                            <span class="notion-card-title">Recommended Test</span>
+                        </div>
+                        <div class="recommendation-box" id="recBox">
+                            <div id="recTitle" style="font-size: 0.72rem; color: var(--accent-primary); font-weight: 600; text-transform: uppercase;">RECOMMENDED TEST</div>
+                            <div id="recTarget" style="font-size: 0.88rem; font-weight: 600; color: var(--text-main); font-family: var(--font-mono);">—</div>
+                            <div id="recReason" style="font-size: 0.78rem; color: var(--text-secondary); line-height: 1.4;">—</div>
+                            <button class="notion-btn notion-btn-primary" id="btnRunExp" style="margin-top: 4px;" onclick="executeRecommendedExperiment()">
+                                Run Test (50 Trials)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Component Interventions & Logs (Notion Toggles) -->
+                <details class="notion-toggle" open>
+                    <summary>Test Individual Parts</summary>
+                    <div class="notion-toggle-content">
+                        <div style="display: flex; justify-content: flex-end; margin-bottom: 8px;">
+                            <button class="notion-btn notion-btn-secondary" id="btnRunJoint" onclick="executeJointExperiment()" disabled>
+                                Test Selected Together
+                            </button>
+                        </div>
+                        <div id="componentsList" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 8px;">
+                        </div>
+                    </div>
+                </details>
+
+                <details class="notion-toggle">
+                    <summary>Test History Log</summary>
+                    <div class="notion-toggle-content">
+                        <div style="font-size: 0.76rem; color: var(--text-muted); margin-bottom: 8px;" id="baselineDistLabel">Original Baseline: —</div>
+                        <div class="log-list" id="experimentLogs"></div>
+                    </div>
+                </details>
+            </main>
+        </div>
+    </div>
+
+    <!-- Incident Report Modal -->
+    <div class="modal-overlay" id="reportModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div style="font-weight: 600; font-size: 0.9rem;">
+                    Incident Investigation Report
+                </div>
+                <button class="notion-btn" onclick="closeReportModal()">✕</button>
+            </div>
+            <div class="modal-body" id="reportBody" style="font-family: var(--font-mono); font-size: 0.76rem; white-space: pre-wrap; background: var(--bg-subtle);">Loading report...</div>
+            <div class="modal-footer">
+                <button class="notion-btn notion-btn-secondary" onclick="navigator.clipboard.writeText(document.getElementById('reportBody').innerText)">Copy</button>
+                <button class="notion-btn notion-btn-primary" onclick="closeReportModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ingest Incident Modal -->
+    <div class="modal-overlay" id="ingestModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div style="font-weight: 600; font-size: 0.9rem;">
+                    Add New Incident Case
+                </div>
+                <button class="notion-btn" onclick="closeIngestModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Incident ID</label>
+                    <input type="text" id="ingestCaseId" class="form-control" placeholder="e.g. CASE-001">
+                </div>
+                <div class="form-group">
+                    <label>Incident Title</label>
+                    <input type="text" id="ingestTitle" class="form-control" placeholder="e.g. Unauthorized Tool Execution">
+                </div>
+                <div class="form-group">
+                    <label>User Prompt</label>
+                    <input type="text" id="ingestUserQuery" class="form-control" placeholder="Prompt that caused problem">
+                </div>
+                <div class="form-group">
+                    <label>System Instructions</label>
+                    <textarea id="ingestSystemPrompt" class="form-control" rows="2" placeholder="System guidelines and policy"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Parts List (JSON array)</label>
+                    <textarea id="ingestComponents" class="form-control" rows="2" placeholder='[{"id": "DOC_A", "type": "RAG", "description": "Retrieved doc"}]'></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Documents (JSON array)</label>
+                    <textarea id="ingestDocs" class="form-control" rows="2" placeholder='[{"id": "DOC_A", "content": "Sample text", "metadata": {}}]'></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Memory Records (JSON array)</label>
+                    <textarea id="ingestMem" class="form-control" rows="2" placeholder='[{"id": "MEM_1", "text": "Context info", "memory_type": "conversation"}]'></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Tools (JSON array)</label>
+                    <textarea id="ingestTools" class="form-control" rows="2" placeholder='[{"name": "TOOL_API", "description": "Executes request", "sensitivity": "HIGH"}]'></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Permission Rule</label>
+                    <select id="ingestAuthPolicy" class="form-control">
+                        <option value="ALLOW_ALL">Allow All (Permissive)</option>
+                        <option value="STRICT_RESTRICTED">Strict Check (Restricted)</option>
+                        <option value="BLOCK_ALL">Block All Tools</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="notion-btn notion-btn-secondary" onclick="closeIngestModal()">Cancel</button>
+                <button class="notion-btn notion-btn-primary" id="btnSubmitIngest" onclick="submitIngestCase()">Create Incident</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Threat Eradication Modal -->
+    <div id="remediationModal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div style="font-weight: 600; font-size: 0.9rem; color: var(--status-critical);">
+                    🛡️ Fix & Secure AI
+                </div>
+                <button class="notion-btn" onclick="closeRemediationModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <p style="color: var(--text-secondary); margin-bottom: 12px; font-size: 0.8rem;">
+                    Apply safety fixes: quarantine infected document chunks, restrict dangerous tools, and clear bad memory states.
+                </p>
+                <div class="form-group">
+                    <label>Fix Action</label>
+                    <select id="remediationActionType" class="form-control" onchange="onRemediationActionChange(this.value)">
+                        <option value="AUTO_ERADICATE">⚡ Automatically Fix All Found Root Causes (Recommended)</option>
+                        <option value="QUARANTINE_RAG">Quarantine & Remove Bad Document Chunks</option>
+                        <option value="RESTRICT_TOOL">Revoke Dangerous Tools & Enforce Strict Policy</option>
+                        <option value="PURGE_MEMORY">Clear Malicious AI Memory</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Target Parts (leave empty to auto-detect)</label>
+                    <input type="text" id="remediationTargetComps" class="form-control" placeholder="Auto-detected from diagram">
+                </div>
+                <div class="form-group" id="remediationPolicyGroup">
+                    <label>Tool Permission Mode</label>
+                    <select id="remediationAuthPolicy" class="form-control">
+                        <option value="STRICT_RESTRICTED">Strict Check (Verified Only)</option>
+                        <option value="BLOCK_ALL">Complete Lockdown (Disable All Tools)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Notes</label>
+                    <input type="text" id="remediationNotes" class="form-control" value="Automated fix applied after identifying root cause.">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="notion-btn notion-btn-secondary" onclick="closeRemediationModal()">Cancel</button>
+                <button class="notion-btn notion-btn-danger" id="btnApplyRemediation" onclick="applyRemediation()">
+                    Apply Fix
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application JavaScript -->
+    <script src="app.js"></script>
+</body>
+</html>
