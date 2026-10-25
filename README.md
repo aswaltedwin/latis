@@ -108,7 +108,7 @@ latis/
 
 The project includes **Zvy**, a demo enterprise AI assistant that handles tasks like customer lookups, refunds, and system diagnostics. Zvy is the AI system that LATIS investigates.
 
-- Zvy is powered by **Groq** (using the Qwen 3.8-27b model) for fast responses and real tool calling.
+- Zvy is powered by the **local Zvy neural model** (`zvy_agent/model/`) — no internet or API key required.
 - It has tools for: looking up customers, processing refunds, sending emails, running diagnostics, and searching the knowledge base.
 - LATIS monitors Zvy's actions in real time and investigates whenever something unsafe happens.
 
@@ -119,7 +119,7 @@ The project includes **Zvy**, a demo enterprise AI assistant that handles tasks 
 ### Requirements
 - Python 3.10 or higher
 - (Optional) [Ollama](https://ollama.com/) running locally for live model inference in the sandbox
-- A [Groq API key](https://console.groq.com/) if you want to run the Zvy agent
+- *(No API key needed — Zvy uses a local trained model)*
 
 ### Install
 
@@ -210,3 +210,4 @@ scikit-learn
 ## License
 
 MIT License
+

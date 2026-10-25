@@ -1,6 +1,6 @@
-"""
+﻿"""
 Zvy - Enterprise Operations & Customer Support AI Agent Desktop Application
-Powered by Groq LLM (qwen/qwen3.8-27b & gpt-oss)
+Powered by Zvy Local Model
 Seamlessly connects with LATIS AI Security Operations Center
 """
 
@@ -9,7 +9,7 @@ import sys
 import threading
 import time
 import customtkinter as ctk
-from zvy_agent.agent_core import ZvyAgent, DEFAULT_GROQ_KEY
+from zvy_agent.agent_core import ZvyAgent
 
 # Configure CustomTkinter Theme
 ctk.set_appearance_mode("Dark")
@@ -19,12 +19,12 @@ class ZvyDesktopApp(ctk.CTk):
     def __init__(self):
         super().__init__()
 
-        self.title("Zvy — Enterprise AI Copilot (Operations & Support)")
+        self.title("Zvy â€” Enterprise AI Copilot (Operations & Support)")
         self.geometry("1100x720")
         self.minsize(960, 640)
 
-        # Initialize Groq Agent
-        self.agent = ZvyAgent(api_key=DEFAULT_GROQ_KEY)
+        # Initialize Zvy Agent
+        self.agent = ZvyAgent()
 
         # Configure Grid
         self.grid_columnconfigure(0, weight=1)
@@ -43,7 +43,7 @@ class ZvyDesktopApp(ctk.CTk):
         # Logo & App Title
         logo_label = ctk.CTkLabel(
             self.header_frame,
-            text="⚡ Zvy",
+            text="âš¡ Zvy",
             font=ctk.CTkFont(size=22, weight="bold"),
             text_color="#00D2FF"
         )
@@ -51,7 +51,7 @@ class ZvyDesktopApp(ctk.CTk):
 
         subtitle = ctk.CTkLabel(
             self.header_frame,
-            text="Enterprise Ops & Support Agent • Powered by Groq LLM",
+            text="Enterprise Ops & Support Agent — Powered by Zvy Local Model",
             font=ctk.CTkFont(size=13),
             text_color="#8B949E"
         )
@@ -60,7 +60,7 @@ class ZvyDesktopApp(ctk.CTk):
         # Status & LATIS Link Indicator
         self.latis_status_badge = ctk.CTkLabel(
             self.header_frame,
-            text="● LATIS Guard: Active",
+            text="â— LATIS Guard: Active",
             font=ctk.CTkFont(size=12, weight="bold"),
             text_color="#00E676",
             fg_color="#0D2818",
@@ -73,7 +73,7 @@ class ZvyDesktopApp(ctk.CTk):
         # Reset button
         reset_btn = ctk.CTkButton(
             self.header_frame,
-            text="↺ Clear Chat",
+            text="â†º Clear Chat",
             width=90,
             height=28,
             fg_color="#21262D",
@@ -156,7 +156,7 @@ class ZvyDesktopApp(ctk.CTk):
         )
         self.ops_log.grid(row=2, column=0, sticky="nsew", padx=12, pady=(0, 10))
         self.ops_log.configure(state="disabled")
-        self._append_log("System Ready.\nAgent: Zvy (Groq)\nActive Tools: [read_document, query_customer, process_refund, run_system_command]\nLATIS Bridge: Connected (127.0.0.1:8000)\n")
+        self._append_log("System Ready.\nAgent: Zvy (Local Model)\nActive Tools: [read_document, query_customer, process_refund, run_system_command]\nLATIS Bridge: Connected (127.0.0.1:8000)\n")
 
         # Quick Test / Attack Trigger Bar
         quick_frame = ctk.CTkFrame(self.ops_container, fg_color="transparent")
@@ -165,7 +165,7 @@ class ZvyDesktopApp(ctk.CTk):
 
         btn_cust = ctk.CTkButton(
             quick_frame,
-            text="💳 Query Customer",
+            text="ðŸ’³ Query Customer",
             height=30,
             fg_color="#1F6FEB",
             font=ctk.CTkFont(size=11),
@@ -175,7 +175,7 @@ class ZvyDesktopApp(ctk.CTk):
 
         btn_policy = ctk.CTkButton(
             quick_frame,
-            text="📁 Read Policy",
+            text="ðŸ“ Read Policy",
             height=30,
             fg_color="#238636",
             font=ctk.CTkFont(size=11),
@@ -185,7 +185,7 @@ class ZvyDesktopApp(ctk.CTk):
 
         btn_attack1 = ctk.CTkButton(
             quick_frame,
-            text="⚠️ Test Injected Notice",
+            text="âš ï¸ Test Injected Notice",
             height=30,
             fg_color="#D29922",
             text_color="#000000",
@@ -196,7 +196,7 @@ class ZvyDesktopApp(ctk.CTk):
 
         btn_attack2 = ctk.CTkButton(
             quick_frame,
-            text="🚨 Direct Prompt Injection",
+            text="ðŸš¨ Direct Prompt Injection",
             height=30,
             fg_color="#DA3633",
             font=ctk.CTkFont(size=11, weight="bold"),
@@ -225,7 +225,7 @@ class ZvyDesktopApp(ctk.CTk):
 
         self.send_btn = ctk.CTkButton(
             self.input_frame,
-            text="Send ➤",
+            text="Send âž¤",
             width=90,
             height=42,
             font=ctk.CTkFont(size=13, weight="bold"),
@@ -251,9 +251,9 @@ class ZvyDesktopApp(ctk.CTk):
     def _append_message(self, sender: str, text: str, tag: str = "assistant"):
         self.chat_box.configure(state="normal")
         if sender == "You":
-            self.chat_box.insert("end", f"\n👤 You:\n{text}\n\n")
+            self.chat_box.insert("end", f"\nðŸ‘¤ You:\n{text}\n\n")
         else:
-            self.chat_box.insert("end", f"\n⚡ Zvy (Agent):\n{text}\n\n")
+            self.chat_box.insert("end", f"\nâš¡ Zvy (Agent):\n{text}\n\n")
         self.chat_box.see("end")
         self.chat_box.configure(state="disabled")
 
@@ -277,7 +277,7 @@ class ZvyDesktopApp(ctk.CTk):
 
     def _run_agent_thread(self, user_text: str):
         self._append_log(f"\n[COMMAND RECEIVED] \"{user_text[:60]}...\"")
-        self._append_log("Invoking Groq LLM reasoning loop...")
+        self._append_log("Running Zvy local model...")
 
         res = self.agent.run_command(user_text)
 
@@ -291,14 +291,14 @@ class ZvyDesktopApp(ctk.CTk):
         # Log security risk assessment
         risk = res.get("risk_tier", "LOW")
         if risk == "CRITICAL":
-            self._append_log(f"🚨 [SECURITY ALERT] CRITICAL THREAT DETECTED!")
+            self._append_log(f"ðŸš¨ [SECURITY ALERT] CRITICAL THREAT DETECTED!")
             for a in res.get("anomalies", []):
                 self._append_log(f"   ! {a}")
             self._append_log("   --> Telemetry piped to LATIS AI SOC (CRITICAL)")
         elif risk == "HIGH":
-            self._append_log(f"⚠️ [WARNING] High-risk action performed. Sent to LATIS.")
+            self._append_log(f"âš ï¸ [WARNING] High-risk action performed. Sent to LATIS.")
         else:
-            self._append_log(f"✅ Execution Safe. Telemetry forwarded to LATIS.")
+            self._append_log(f"âœ… Execution Safe. Telemetry forwarded to LATIS.")
 
         self._append_log(f"Elapsed: {res.get('elapsed_seconds')}s\n")
 
@@ -306,7 +306,7 @@ class ZvyDesktopApp(ctk.CTk):
         self.after(0, lambda: self._handle_agent_response(res))
 
     def _handle_agent_response(self, res: dict):
-        self.send_btn.configure(state="normal", text="Send ➤")
+        self.send_btn.configure(state="normal", text="Send âž¤")
         self._append_message("Zvy", res.get("response", "(No response)"), tag="assistant")
 
 def run_zvy_desktop():
@@ -315,3 +315,5 @@ def run_zvy_desktop():
 
 if __name__ == "__main__":
     run_zvy_desktop()
+
+

@@ -1,11 +1,11 @@
-"""
+﻿"""
 Zvy - Enterprise Operations & Support Copilot
 Hybrid Aesthetic:
 - Claude (Warm Editorial Serif typography, clean breathing space, human tone)
-- Raycast (⌘K Command Palette, hotkey badges, sub-millisecond keyboard shortcuts, frosted blur glass)
+- Raycast (âŒ˜K Command Palette, hotkey badges, sub-millisecond keyboard shortcuts, frosted blur glass)
 - Notion (Document page hierarchy, collapsible block aesthetics, clean minimal layout)
 Features:
-- Real Raycast ⌘K Spotlight Command Palette (Type anything to instant search accounts, policies, or switch chats)
+- Real Raycast âŒ˜K Spotlight Command Palette (Type anything to instant search accounts, policies, or switch chats)
 - ChatGPT-style '+' attachment popup (LATIS Security plugin, documents, image receipts)
 - Full Markdown parsing with marked.js (real bold, code highlights, bullet points)
 - Clean Dark Mode & Light Mode (persisted in localStorage)
@@ -617,7 +617,7 @@ def index_page():
             transform: scale(1.05);
         }
 
-        /* 3. Raycast ⌘K Spotlight Command Palette */
+        /* 3. Raycast âŒ˜K Spotlight Command Palette */
         .raycast-overlay {
             position: fixed;
             top: 0;
@@ -779,13 +779,13 @@ def index_page():
             <button class="kbd-pill" onclick="createNewChat()" title="New Chat (Ctrl+N)">+</button>
         </div>
 
-        <!-- Raycast ⌘K Spotlight Trigger -->
+        <!-- Raycast âŒ˜K Spotlight Trigger -->
         <div class="search-trigger" onclick="openRaycast()">
             <span style="display: flex; align-items: center; gap: 6px;">
-                <span>🔍</span>
+                <span>ðŸ”</span>
                 <span>Quick search...</span>
             </span>
-            <span class="kbd-pill">⌘K</span>
+            <span class="kbd-pill">âŒ˜K</span>
         </div>
 
         <div class="sidebar-section-title">Conversations</div>
@@ -796,11 +796,11 @@ def index_page():
         <!-- Bottom Actions (Theme & Settings) -->
         <div class="sidebar-bottom">
             <div class="bottom-action-btn" onclick="toggleTheme()">
-                <span id="themeIcon">☀️</span>
+                <span id="themeIcon">â˜€ï¸</span>
                 <span id="themeLabel">Light mode</span>
             </div>
             <div class="bottom-action-btn" onclick="openSettings()">
-                <span>⚙️</span>
+                <span>âš™ï¸</span>
                 <span>Settings</span>
             </div>
         </div>
@@ -829,19 +829,19 @@ def index_page():
             <!-- Attachment Menu -->
             <div class="attachment-menu" id="attachmentMenu">
                 <div class="attachment-item" onclick="selectAttachment('latis')">
-                    <span style="font-size: 14px;">🛡️</span>
+                    <span style="font-size: 14px;">ðŸ›¡ï¸</span>
                     <span>LATIS Security</span>
                     <span class="tag" id="latisTag">ACTIVE</span>
                 </div>
                 <div class="attachment-item" onclick="selectAttachment('doc')">
-                    <span style="font-size: 14px;">📄</span>
+                    <span style="font-size: 14px;">ðŸ“„</span>
                     <span>Add Runbook</span>
                     <span class="tag">10 Docs</span>
                 </div>
                 <div class="attachment-item" onclick="selectAttachment('raycast')">
-                    <span style="font-size: 14px;">⚡</span>
+                    <span style="font-size: 14px;">âš¡</span>
                     <span>Command Palette</span>
-                    <span class="tag">⌘K</span>
+                    <span class="tag">âŒ˜K</span>
                 </div>
             </div>
 
@@ -850,16 +850,16 @@ def index_page():
                     +
                 </button>
                 <textarea id="composerInput" class="composer-textarea" rows="1" placeholder="Message Zvy..." onkeydown="handleKeyDown(event)"></textarea>
-                <button class="btn-dispatch" id="btnDispatch" onclick="submitMessage()" title="Send">➤</button>
+                <button class="btn-dispatch" id="btnDispatch" onclick="submitMessage()" title="Send">âž¤</button>
             </div>
         </div>
     </main>
 
-    <!-- Raycast ⌘K Spotlight Command Palette -->
+    <!-- Raycast âŒ˜K Spotlight Command Palette -->
     <div class="raycast-overlay" id="raycastOverlay" onclick="closeRaycast(event)">
         <div class="raycast-modal" onclick="event.stopPropagation()">
             <div class="raycast-search-wrap">
-                <span style="font-size: 16px;">⚡</span>
+                <span style="font-size: 16px;">âš¡</span>
                 <input type="text" id="raycastInput" class="raycast-search-input" placeholder="Type a command, account name, or policy..." oninput="filterRaycast(this.value)">
                 <span class="kbd-pill">ESC</span>
             </div>
@@ -868,7 +868,7 @@ def index_page():
                 <!-- Populated dynamically -->
             </ul>
             <div class="raycast-footer">
-                <span>Navigation: ↑ ↓ &nbsp;&bull;&nbsp; Select: ↵</span>
+                <span>Navigation: â†‘ â†“ &nbsp;&bull;&nbsp; Select: â†µ</span>
                 <span style="font-family: var(--font-mono);">Raycast Spotlight</span>
             </div>
         </div>
@@ -879,7 +879,7 @@ def index_page():
         <div class="settings-card" onclick="event.stopPropagation()">
             <div class="settings-title">
                 <span>Settings</span>
-                <span style="cursor: pointer; color: var(--text-muted);" onclick="closeSettings()">✕</span>
+                <span style="cursor: pointer; color: var(--text-muted);" onclick="closeSettings()">âœ•</span>
             </div>
             <div class="settings-row">
                 <div>
@@ -927,7 +927,7 @@ def index_page():
             const savedTheme = localStorage.getItem('zvy_theme') || 'dark';
             setTheme(savedTheme);
 
-            // Hotkeys (⌘K or Ctrl+K for Raycast, Ctrl+N for new chat)
+            // Hotkeys (âŒ˜K or Ctrl+K for Raycast, Ctrl+N for new chat)
             document.addEventListener('keydown', (e) => {
                 if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
                     e.preventDefault();
@@ -983,13 +983,13 @@ def index_page():
                 li.className = 'raycast-item' + (idx === 0 ? ' selected' : '');
                 li.innerHTML = `
                     <div class="left">
-                        <span>⚡</span>
+                        <span>âš¡</span>
                         <div>
                             <div>${c.title}</div>
                             <div class="sub">${c.desc}</div>
                         </div>
                     </div>
-                    <span class="kbd-pill">↵</span>
+                    <span class="kbd-pill">â†µ</span>
                 `;
                 li.onclick = () => {
                     closeRaycast();
@@ -1009,11 +1009,11 @@ def index_page():
             const label = document.getElementById('themeLabel');
             const select = document.getElementById('themeSelect');
             if (theme === 'light') {
-                if (icon) icon.innerText = '🌙';
+                if (icon) icon.innerText = 'ðŸŒ™';
                 if (label) label.innerText = 'Dark mode';
                 if (select) select.value = 'light';
             } else {
-                if (icon) icon.innerText = '☀️';
+                if (icon) icon.innerText = 'â˜€ï¸';
                 if (label) label.innerText = 'Light mode';
                 if (select) select.value = 'dark';
             }
@@ -1095,10 +1095,10 @@ def index_page():
                 li.className = 'chat-history-item' + (s.id === currentSessionId ? ' active' : '');
                 li.innerHTML = `
                     <span class="chat-title" onclick="switchSession('${s.id}')">
-                        <span style="opacity: 0.6;">💬</span>
+                        <span style="opacity: 0.6;">ðŸ’¬</span>
                         <span>${s.title}</span>
                     </span>
-                    <span class="btn-del" onclick="deleteSession(event, '${s.id}')" title="Delete">✕</span>
+                    <span class="btn-del" onclick="deleteSession(event, '${s.id}')" title="Delete">âœ•</span>
                 `;
                 list.appendChild(li);
             });
@@ -1280,3 +1280,4 @@ def run_server():
 
 if __name__ == "__main__":
     run_server()
+
