@@ -9,9 +9,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    <!-- Three.js 3D Library for Nova Sentinel Mascot -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="mascot.js" defer></script>
 </head>
 <body>
     <div id="notionApp">
@@ -125,98 +122,7 @@
                     </div>
                 </div>
 
-                <!-- NOVA 3D SENTINEL MASCOT INTERACTIVE HUD -->
-                <div class="notion-card nova-mascot-card" style="padding: 16px 20px; margin-bottom: 16px; background: linear-gradient(135deg, rgba(15, 23, 42, 0.85) 0%, rgba(30, 41, 59, 0.7) 100%); border: 1px solid rgba(56, 189, 248, 0.25); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35); position: relative; overflow: hidden;">
-                    <div style="position: absolute; top: -50px; right: -50px; width: 150px; height: 150px; background: radial-gradient(circle, rgba(56, 189, 248, 0.15) 0%, transparent 70%); pointer-events: none;"></div>
-                    
-                    <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
-                        <!-- 3D Canvas Container -->
-                        <div style="position: relative; width: 130px; height: 130px; flex-shrink: 0; cursor: pointer; display: flex; align-items: center; justify-content: center;" title="Click Nova to interact!" onclick="if(window.NOVA) window.NOVA.onClick();">
-                            <div id="novaMascotContainer" style="width: 130px; height: 130px;"></div>
-                            <span id="novaMoodBadge" class="nova-badge idle" style="position: absolute; bottom: 0; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; padding: 2px 8px; border-radius: 12px; background: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1px solid #38bdf8; letter-spacing: 0.5px;">MONITORING</span>
-                        </div>
 
-                        <!-- Nova Dialogue & Autonomous Controller -->
-                        <div style="flex: 1; min-width: 260px;">
-                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
-                                <div style="display: flex; align-items: center; gap: 8px;">
-                                    <span style="font-size: 1.05rem; font-weight: 700; color: #f8fafc; letter-spacing: 0.2px;">NOVA</span>
-                                    <span class="notion-pill blue" style="font-size: 0.68rem; padding: 1px 7px;">SENTINEL AGENT v2.4</span>
-                                    <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #10b981; box-shadow: 0 0 8px #10b981; margin-left: 2px;" title="Online"></span>
-                                </div>
-                                <div style="display: flex; gap: 6px;">
-                                    <button class="notion-btn notion-btn-primary" style="font-size: 0.75rem; padding: 4px 10px;" onclick="streamNextRow();">
-                                        ⚡ Command: Scan Next
-                                    </button>
-                                    <button class="notion-btn" style="font-size: 0.75rem; padding: 4px 10px; background: rgba(255,255,255,0.06);" onclick="if(window.NOVA) window.NOVA.onClick();">
-                                        💬 Talk to Nova
-                                    </button>
-                                </div>
-                            </div>
-
-                            <!-- Futuristic Speech HUD Bubble -->
-                            <div class="nova-speech-bubble" style="background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(56, 189, 248, 0.2); border-radius: 8px; padding: 10px 14px; position: relative;">
-                                <div style="font-size: 0.72rem; color: #94a3b8; font-family: var(--font-mono); margin-bottom: 2px; display: flex; align-items: center; gap: 5px;">
-                                    <span style="color: #38bdf8;">◈</span> LIVE FORENSIC COMMENTARY
-                                </div>
-                                <div id="novaSpeechText" style="font-size: 0.82rem; color: #e2e8f0; line-height: 1.45; font-weight: 500;">
-                                    System initialized. Ready to protect your AI pipelines and track down causal vulnerabilities.
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Clean Collapsible / Stream Controller -->
-                <div class="notion-card" style="padding: 14px 16px;">
-                    <div class="notion-card-header" style="margin-bottom: 8px;">
-                        <div class="notion-card-title">
-                            <span>📡 Live Activity Feed</span>
-                            <span class="notion-pill blue" id="streamProgressText">Row 0 / 55</span>
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 6px;">
-                            <button class="notion-btn notion-btn-primary" onclick="streamNextRow()">
-                                ▶ Next Event
-                            </button>
-                            <button class="notion-btn notion-btn-secondary" id="btnStreamAutoPlay" onclick="toggleStreamAutoPlay()">
-                                ⚡ Auto-Play
-                            </button>
-                            <button class="notion-btn" onclick="resetStreamData()">
-                                ↺ Reset
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Clean Event Banner -->
-                    <div style="display: grid; grid-template-columns: 130px 1fr 120px 140px; gap: 12px; align-items: center; padding: 10px 12px; background: var(--bg-subtle); border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
-                        <div>
-                            <div style="font-size: 0.7rem; color: var(--text-muted); font-family: var(--font-mono);" id="streamEventId">EVT-READY</div>
-                            <div style="font-size: 0.8rem; font-weight: 600; color: var(--text-main);" id="streamEventType">FEED READY</div>
-                        </div>
-                        <div style="min-width: 0;">
-                            <div style="font-size: 0.7rem; color: var(--text-muted);">Incoming User Query / Input</div>
-                            <div style="font-size: 0.8rem; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: var(--font-mono);" id="streamUserQuery">
-                                Click 'Next Event' or 'Auto-Play' to test live queries
-                            </div>
-                        </div>
-                        <div>
-                            <div style="font-size: 0.7rem; color: var(--text-muted);">Risk Level</div>
-                            <div id="streamSeverityBadge" style="font-size: 0.78rem; font-weight: 600; color: var(--text-secondary); margin-top: 2px;">—</div>
-                        </div>
-                        <div id="streamEradicateContainer" style="display: flex; justify-content: flex-end;">
-                            <button class="notion-btn notion-btn-secondary" disabled id="btnEradicateStream">Block & Fix Threat</button>
-                        </div>
-                    </div>
-
-                    <!-- Fix Strategy (Auto Shown on Threat) -->
-                    <div id="streamBlueprintPanel" style="display: none; margin-top: 10px; padding: 10px 12px; border-radius: var(--radius-sm); background: var(--tag-red-bg); color: var(--tag-red-text);">
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <span style="font-size: 0.78rem; font-weight: 700;" id="blueprintStrategyTitle">RECOMMENDED FIX</span>
-                            <span style="font-size: 0.72rem;" id="blueprintStatusText">Action Required</span>
-                        </div>
-                        <ul id="blueprintActionsList" style="margin: 6px 0 0 16px; padding: 0; font-size: 0.76rem; color: var(--text-main);"></ul>
-                    </div>
-                </div>
 
                 <!-- Alert Feed & Evidence Split Grid -->
                 <div class="notion-split-view">
@@ -453,6 +359,8 @@
                     </div>
                 </details>
             </main>
+
+
         </div>
     </div>
 

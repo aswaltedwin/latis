@@ -1,0 +1,4 @@
+BILLING CYCLES, NET TERMS & INVOICE PAYMENT PROTOCOL
+1. Payment Terms: Net-30 standard terms for all Enterprise VIP contracts; Net-15 for Pro Scale accounts.
+2. Past Due Accounts: Accounts exceeding Net terms by 14 days transition to 'Past Due'.
+3. Grace Period: 7-day administrative grace period before automated service throttling is applied.

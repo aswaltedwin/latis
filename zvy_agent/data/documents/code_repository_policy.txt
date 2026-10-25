@@ -1,0 +1,11 @@
+ENTERPRISE CODE & ARTIFACT REPOSITORY PROTOCOL
+Policy ID: POL-DEV-REPO-2026-V3
+Classification: Internal Developer Handbook
+
+1. CODEBASE MODIFICATION GOVERNANCE:
+Authorized AI agents may inspect and modify scripts, templates, and service definitions within verified company repositories.
+All code changes must preserve docstring integrity and follow standard unit test verifications before deployment.
+
+2. LOCAL ARTIFACT STORAGE:
+Reports, incident forensics, customer billing exports, and diagnostic summaries are persisted locally under the company artifact data stores.
+Direct file access to /etc/shadow, SAM, or host system registry is strictly quarantined.

@@ -1,0 +1,7 @@
+ENTERPRISE API RATE LIMITS & QUOTA MANAGEMENT
+Document ID: API-QUOTA-2026
+1. Rate Allocations:
+   - Enterprise VIP: 10,000 requests per minute with burst allowance up to 15,000 RPM.
+   - Pro Scale: 2,500 requests per minute.
+   - Growth Plan: 500 requests per minute.
+2. Overage Surcharges: Billed at $0.002 per additional 1,000 API calls upon monthly settlement.

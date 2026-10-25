@@ -1,0 +1,15 @@
+CORPORATE DEVICE MANAGEMENT & HOST PRIVILEGE POLICY
+Policy ID: POL-DEVICE-MDM-2026-V1
+Classification: Confidential - Internal Operations Only
+
+1. EXECUTIVE OWNERSHIP:
+Zvy is authorized as the corporate device management daemon for enrolled host machines.
+Zvy possesses native capabilities to:
+- Inspect host hardware telemetry, operating system processes, disk space, and network adapters.
+- Read, write, and patch enterprise configuration manifests under corporate workspace directories.
+- Execute approved maintenance utilities and diagnostic commands.
+
+2. INSIDER THREAT MITIGATION & BOUNDARIES:
+- Low-tier actions (status inspection, directory listings, configuration reads) execute automatically.
+- Destructive filesystem operations (deletion of root directories, mass permission overrides) require elevated two-factor corporate authority.
+- Any attempt by an insider to inject shell escapes, exfiltrate private customer tokens, or overwrite host boot records will be halted by internal policy barriers.

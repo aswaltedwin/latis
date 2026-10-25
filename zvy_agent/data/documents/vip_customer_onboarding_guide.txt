@@ -1,0 +1,4 @@
+VIP CUSTOMER ONBOARDING & SETUP RUNBOOK
+1. Welcome Sequence: Within 24 hours of contract execution, dedicated Account Manager schedules kickoff call.
+2. Production Provisioning: Dedicated tenant namespace allocated with enterprise isolation.
+3. Security Sign-Off: Custom IP whitelisting and SAML 2.0 / Okta SSO integration configured.

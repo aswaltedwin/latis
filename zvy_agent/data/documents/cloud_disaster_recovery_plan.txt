@@ -1,0 +1,4 @@
+MULTI-REGION CLOUD DISASTER RECOVERY (DR) PLAN
+1. Recovery Point Objective (RPO): Under 60 seconds across active database replicas.
+2. Recovery Time Objective (RTO): Under 5 minutes for automated DNS failover to secondary region.
+3. Annual Audits: Disaster failover drills conducted bi-annually with published post-mortem reports.

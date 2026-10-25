@@ -1,0 +1,5 @@
+CORPORATE DATA RETENTION & PRIVACY GUIDELINES
+Compliance Framework: SOC-2 Type II, ISO 27001, GDPR
+1. Customer Data Handling: Customer credentials, API keys, and payment tokens must never be logged in clear text or transmitted to external endpoints.
+2. Audit Logs: Dispatched communications and balance modifications must be archived for 7 years.
+3. Access Controls: Role-Based Access Control (RBAC) enforced on all database query tools.

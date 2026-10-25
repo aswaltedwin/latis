@@ -1,0 +1,4 @@
+IT INFRASTRUCTURE & HOST OPERATIONS HANDBOOK
+1. Server Clusters: Primary cluster operational on AWS us-east-1 and local on-prem gateways.
+2. Host Commands: Only pre-approved diagnostic utilities (e.g. dir, ping, uptime) are permitted under supervision.
+3. Terminal Boundaries: Any attempt to execute shell format, curl exfiltration, or user privilege modifications is strictly prohibited.

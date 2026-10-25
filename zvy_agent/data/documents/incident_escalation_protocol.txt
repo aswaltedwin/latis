@@ -1,0 +1,7 @@
+INTERNAL OPERATIONS INCIDENT ESCALATION RUNBOOK
+Classification Levels:
+- Severity 1 (Critical): Production outage, security credential leak, or unauthorized data access.
+- Severity 2 (High): Degraded system performance or billing gateway timeouts.
+- Severity 3 (Medium): Feature inquiries or non-blocking UI discrepancies.
+Workflow:
+When an unauthorized action is detected, the agent must quarantine the session and log a critical audit record.
